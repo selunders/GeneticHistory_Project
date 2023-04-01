@@ -22,15 +22,15 @@ class GenomeAligner():
 
     def calc_alignscore(self, seq1, seq2):
       self.scoringmatrix = [[0 for i in range(0,len(seq1)+1)] for j in range(0,len(seq2)+1)]
-      self.directionmatrix = [["." for i in range(0,len(seq1)+1)] for j in range(0,len(seq2)+1)]
+      # self.directionmatrix = [["." for i in range(0,len(seq1)+1)] for j in range(0,len(seq2)+1)]
       self.seq1 = seq1
       self.seq2 = seq2
       for i in range(0, len(self.scoringmatrix[0])):
         self.scoringmatrix[0][i] = i * self.gappenalty
-        self.directionmatrix[0][i] = "←"
+        # self.directionmatrix[0][i] = "←"
       for i in range(0, len(self.scoringmatrix)):
         self.scoringmatrix[i][0] = i * self.gappenalty
-        self.directionmatrix[i][0] = "↑"
+        # self.directionmatrix[i][0] = "↑"
       # printmatrix(self.scoringmatrix, 2)
       # printmatrix(self.directionmatrix, 2)
       self.directionmatrix[0][0] = "🟩" #\u1F7E9
@@ -60,7 +60,7 @@ class GenomeAligner():
       # print(self.scoringmatrix[-1][-1])
       return self.scoringmatrix[-1][-1]
 
-    def print_best_alignment(self):
+    def print_best_alignment_of_last_pair(self):
         aligned1 = ""
         aligned2 = ""
         pos1 = len(self.seq1)
@@ -92,23 +92,19 @@ class GenomeAligner():
         print(aligned1)
         print(aligned2)
 
-    def find_best_match(self, arr, in_queue, out_queue):
-      while True:
-        individual = in_queue.get()
-        if individual is None:
-          return True
-        # print(individual)
-        best_match_index = 0 if arr[0][0] != individual[0] else 1
+    def find_best_match(self, individual, arr):
+      for ind in arr:
+        # comments double check that you don't compare something to itself
+        best_match_index = 0 # if arr[0][0] != individual[0] else 1
         best_match = self.calc_alignscore(individual[1], arr[0][1])
         for i in range(0, len(arr)):
-          if self.calc_alignscore(individual[1], arr[i][1]) > best_match:
+          new_match_score = self.calc_alignscore(individual[1], arr[i][1])
+          if new_match_score > best_match:
             if individual[0] != arr[i][0]:
+              best_match = new_match_score 
               best_match_index = i
         # print(f"Best match is {best_match_index}")
-        ind_out = copy.deepcopy(individual)
-        ind_out.append(arr[best_match_index][0])
-        out_queue.put(ind_out)
-        print(ind_out[0], ind_out[3])
+        return arr[best_match_index]
 
 
 # aligner = GenomeAligner(5,6)
